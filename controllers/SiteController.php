@@ -11,6 +11,7 @@ use yii\data\Pagination;
 use app\models\LoginForm;
 use app\models\ContactForm;
 use app\models\Article;
+use app\models\Category;
 
 class SiteController extends Controller
 {
@@ -56,9 +57,22 @@ class SiteController extends Controller
         ];
     }
 
-    public function actionView()
+    public function actionView($id)
     {
-        return $this->render('single');
+        $article = Article::findOne($id);
+
+        $popular = Article::getPopular();
+
+        $recent = Article::getRecent();
+
+        $categories = Category::getAll();
+
+        return $this->render('single', [
+            'article' => $article,
+            'popular' => $popular,
+            'recent' => $recent,
+            'categories' => $categories
+        ]);
     }
 
     public function actionCategory()
@@ -73,17 +87,20 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        $query = Article::find();
+        $data = Article::getAll();
 
-        $count = $query->count();
+        $popular = Article::getPopular();
 
-        $pagination = new Pagination(['totalCount' => $count, 'pageSize' => 1]);
+        $recent = Article::getRecent();
 
-        $articles = $query->offset($pagination->offset)->limit($pagination->limit)->all();
+        $categories = Category::getAll();
 
         return $this->render('index', [
-            'articles' => $articles,
-            'pagination' => $pagination
+            'articles' => $data['articles'],
+            'pagination' => $data['pagination'],
+            'popular' => $popular,
+            'recent' => $recent,
+            'categories' => $categories
         ]);
     }
 
