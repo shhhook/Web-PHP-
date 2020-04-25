@@ -37,6 +37,15 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         return $this->id;
     }
 
+    public function getImage()
+    {
+        if ($this->photo){
+            return $this->photo;
+        }
+
+        return '/no-image-found.png';
+    }
+
     public function getAuthKey()
     {
 

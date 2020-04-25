@@ -87,8 +87,8 @@ class Article extends \yii\db\ActiveRecord
 
     public function getImage()
     {
-        if($this->image){
-            return '/uploads/'.$this->image;
+        if ($this->image) {
+            return '/uploads/' . $this->image;
         }
 
         return '/no-image-found.png';
@@ -107,9 +107,9 @@ class Article extends \yii\db\ActiveRecord
 
     public function saveCategory($category_id)
     {
-        $category=Category::findOne($category_id);
+        $category = Category::findOne($category_id);
 
-        if($category != null){
+        if ($category != null) {
             $this->link('category', $category);
             return true;
         }
@@ -127,19 +127,37 @@ class Article extends \yii\db\ActiveRecord
         return Yii::$app->formatter->asDate($this->date);
     }
 
+    public function saveArticle()
+    {
+        $this->user_id = Yii::$app->user->id;
+        return $this->save(false);
+    }
+
+    public function getAuthor()
+    {
+        return $this->hasOne(User::className(), ['id' => 'user_id']);
+    }
+
+    public function viewedCounter()
+    {
+        $this->viewed += 1;
+        return $this->save(false);
+    }
+
     public function saveTags($tags)
     {
-        if(is_array($tags)){
+        if (is_array($tags)) {
             $this->clearCurrentTags();
 
-            foreach($tags as $tag_id){
+            foreach ($tags as $tag_id) {
                 $tag = Tag::findOne($tag_id);
                 $this->link('tags', $tag);
             }
         }
     }
 
-    public function clearCurrentTags(){
+    public function clearCurrentTags()
+    {
         ArticleTag::deleteAll(['article_id' => $this->id]);
     }
 
@@ -187,5 +205,10 @@ class Article extends \yii\db\ActiveRecord
     public function getComments()
     {
         return $this->hasMany(Comment::className(), ['article_id' => 'id']);
+    }
+
+    public function getArticleComments()
+    {
+        return $this->getComments()->where(['status' => 1])->all();
     }
 }

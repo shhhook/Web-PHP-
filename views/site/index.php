@@ -42,9 +42,9 @@
                     </div>
                     <div class="social-share">
                         <span class="social-share-title pull-left text-capitalize">
-                            By <a href="#">Rubel</a>
-
-                            <?= $article->getDate() ?>
+                            By <a href="#">
+                                <?= $article->author->name ?> On <?= $article->getDate() ?>
+                            </a>
                         </span>
                         <ul class="text-center pull-right">
                             <li>

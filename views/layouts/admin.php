@@ -40,6 +40,7 @@ AppAsset::register($this);
         'items' => [
            ['label' => 'Home', 'url' => ['/admin/default/index']],
            ['label' => 'Articles', 'url' => ['/admin/article/index']],
+           ['label' => 'Commentaries' , 'url' => ['/admin/comment/index']],
            ['label' => 'Categories', 'url' => ['/admin/category/index']],
            ['label' => 'Tag', 'url' => ['/admin/tag/index']],
         ],
@@ -63,6 +64,17 @@ AppAsset::register($this);
         <p class="pull-right"><?= Yii::powered() ?></p>
     </div>
 </footer>
+
+<?php $this->registerJsFile('/ckeditor/ckeditor.js') ?>
+<?php $this->registerJsFile('/ckfinder/ckfinder.js') ?>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        let editor = CKEDITOR.replaceAll();
+
+        CKFinder.setupCKEditor(editor);
+    });
+</script>
 
 <?php $this->endBody() ?>
 </body>
