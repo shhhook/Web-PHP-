@@ -40,7 +40,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     public function getImage()
     {
         if ($this->photo){
-            return $this->photo;
+            return '/uploads/'.$this->photo;
         }
 
         return '/no-image-found.png';

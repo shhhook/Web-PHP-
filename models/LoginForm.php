@@ -44,11 +44,19 @@ class LoginForm extends Model
         }
     }
 
+    public function codePass()
+    {
+        $this->password = md5($this->password);
+    }
+
     public function login()
     {
+        $this->codePass();
+
         if ($this->validate()) {
             return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600*24*30 : 0);
         }
+
         return false;
     }
 

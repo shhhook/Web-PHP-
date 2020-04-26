@@ -10,6 +10,7 @@ use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use app\assets\PublicAsset;
+use app\models\User;
 
 PublicAsset::register($this);
 ?>
@@ -62,8 +63,17 @@ PublicAsset::register($this);
                             </li>
                         <?php else: ?>
                             <?= Html::beginForm(['auth/logout'], 'post')
-                             .  Html::submitButton('Logout (' . Yii::$app->user->identity->name . ')', ['class' => 'btn btn-link logout', 'style' => 'padding-top: 10px;'])
-                             .  Html::endForm() ?>
+                            . Html::a(Html::img((User::find()->where(['id' => Yii::$app->user->identity->id])->one())->getImage(), [
+                                'alt' => 'Profile',
+                                'width' => 50,
+                                'class' => 'img-circle'
+                            ]), [
+                                '/auth/view', 'id' => Yii::$app->user->identity->id
+                            ], [
+                                'class' => 'btn'
+                            ])
+                            .  Html::submitButton('Logout (' . Yii::$app->user->identity->name . ')', ['class' => 'btn btn-link logout', 'style' => 'padding-top: 10px;'])
+                            .  Html::endForm() ?>
 
                         <?php endif ?>
                     </ul>
