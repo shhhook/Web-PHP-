@@ -1,6 +1,7 @@
 <?php
 
 /* @var $this \yii\web\View */
+
 /* @var $content string */
 
 use app\widgets\Alert;
@@ -11,6 +12,10 @@ use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use app\assets\PublicAsset;
 use app\models\User;
+
+use app\models\Comment;
+use app\models\Article;
+use app\models\Category;
 
 PublicAsset::register($this);
 ?>
@@ -53,7 +58,7 @@ PublicAsset::register($this);
                 </ul>
                 <div class="i_con">
                     <ul class="nav navbar-nav text-uppercase">
-                        <?php if(Yii::$app->user->isGuest): ?>
+                        <?php if (Yii::$app->user->isGuest): ?>
                             <li>
                                 <a href="<?= Url::toRoute(['auth/login']) ?>">Login</a>
                             </li>
@@ -72,8 +77,8 @@ PublicAsset::register($this);
                             ], [
                                 'class' => 'btn'
                             ])
-                            .  Html::submitButton('Logout (' . Yii::$app->user->identity->name . ')', ['class' => 'btn btn-link logout', 'style' => 'padding-top: 10px;'])
-                            .  Html::endForm() ?>
+                            . Html::submitButton('Logout (' . Yii::$app->user->identity->name . ')', ['class' => 'btn btn-link logout', 'style' => 'padding-top: 10px;'])
+                            . Html::endForm() ?>
 
                         <?php endif ?>
                     </ul>
@@ -100,109 +105,105 @@ PublicAsset::register($this);
         <div class="row">
             <div class="col-md-4">
                 <aside class="footer-widget">
-                    <div class="about-img"><img src="/public/images/logo2.png" alt=""></div>
-                    <div class="about-content">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
-                        eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed voluptua. At vero eos et
-                        accusam et justo duo dlores et ea rebum magna text ar koto din.
+                    <div class="about-img"><img src="/public/images/logo.png" alt=""></div>
+                    <div class="about-content">Добрий день, це мій блог.
                     </div>
                     <div class="address">
-                        <h4 class="text-uppercase">contact Info</h4>
+                        <h4 class="text-uppercase">Contact Info</h4>
 
                         <p> 14529/12 NK Streets, DC, KZ</p>
 
                         <p> Phone: +123 456 78900</p>
 
-                        <p>mytreasure.com</p>
+                        <p>hodzitsky.com</p>
                     </div>
                 </aside>
             </div>
 
-            <div class="col-md-4">
-                <aside class="footer-widget">
-                    <h3 class="widget-title text-uppercase">Testimonials</h3>
+            <?php
+                $countComments = 3;
+                $comments = Comment::getRecentComment($countComments);
+                if (!empty($comments)):
+            ?>
+                <div class="col-md-4">
+                    <aside class="footer-widget">
+                        <h3 class="widget-title text-uppercase">Recent Commets</h3>
 
-                    <div id="myCarousel" class="carousel slide" data-ride="carousel">
-                        <!--Indicator-->
-                        <ol class="carousel-indicators">
-                            <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
-                            <li data-target="#myCarousel" data-slide-to="1"></li>
-                            <li data-target="#myCarousel" data-slide-to="2"></li>
-                        </ol>
-                        <div class="carousel-inner" role="listbox">
-                            <div class="item active">
-                                <div class="single-review">
-                                    <div class="review-text">
-                                        <p>Lorem ipsum dolor sit amet, conssadipscing elitr, sed diam nonumy eirmod
-                                            tempvidunt ut labore et dolore magna aliquyam erat,sed diam voluptua. At
-                                            vero eos et accusam justo duo dolores et ea rebum.gubergren no sea takimata
-                                            magna aliquyam eratma</p>
-                                    </div>
-                                    <div class="author-id">
-                                        <img src="/public/images/author.png" alt="">
+                        <div id="myCarousel" class="carousel slide" data-ride="carousel">
+                            <!--Indicator-->
+                            <ol class="carousel-indicators">
+                                <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
 
-                                        <div class="author-text">
-                                            <h4>Sophia</h4>
+                                <?php for($i = 1; $i < count($comments); $i++): ?>
+                                    <li data-target="#myCarousel" data-slide-to="<?= $i; ?>"></li>
+                                <?php endfor; ?>
+                            </ol>
 
-                                            <h4>CEO, ReadyTheme</h4>
+                            <div class="carousel-inner" role="listbox">
+                                <?php for ($i = 0; $i < count($comments); $i++): ?>
+                                    <?php if($i == 0): ?>
+                                        <div class="item active">
+                                    <?php else: ?>
+                                        <div class="item">
+                                    <?php endif; ?>
+
+                                        <div class="single-review">
+                                            <div class="review-text">
+                                                <p>
+                                                    <?= mb_strimwidth($comments[$i]->text, 0, 80, '...'); ?>
+                                                </p>
+                                            </div>
+
+                                            <div class="author-id">
+                                                <?= Html::img((User::find()->where(['id' => $comments[$i]->user])->one())->getImage(), ['alt' => 'Profile', 'width' => 50, 'class' => 'img-circle']) ?>
+
+                                                <div class="author-text">
+                                                    <h4>
+                                                        <?= $comments[$i]->user->name; ?>
+                                                    </h4>
+
+                                                    <h4>
+                                                        <a href="<?= Url::toRoute(['site/category', 'id' => $comments[$i]->article->category->id]) ?>">
+                                                            <?= $comments[$i]->article->category->title; ?>,
+                                                        </a>
+
+                                                        <a href="<?= Url::toRoute(['site/view', 'id' => $comments[$i]->article->id]) ?>">
+                                                            <?= $comments[$i]->article->title; ?>
+                                                        </a>
+                                                    </h4>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="item">
-                                <div class="single-review">
-                                    <div class="review-text">
-                                        <p>Lorem ipsum dolor sit amet, conssadipscing elitr, sed diam nonumy eirmod
-                                            tempvidunt ut labore et dolore magna aliquyam erat,sed diam voluptua. At
-                                            vero eos et accusam justo duo dolores et ea rebum.gubergren no sea takimata
-                                            magna aliquyam eratma</p>
-                                    </div>
-                                    <div class="author-id">
-                                        <img src="/public/images/author.png" alt="">
-
-                                        <div class="author-text">
-                                            <h4>Sophia</h4>
-
-                                            <h4>CEO, ReadyTheme</h4>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="item">
-                                <div class="single-review">
-                                    <div class="review-text">
-                                        <p>Lorem ipsum dolor sit amet, conssadipscing elitr, sed diam nonumy eirmod
-                                            tempvidunt ut labore et dolore magna aliquyam erat,sed diam voluptua. At
-                                            vero eos et accusam justo duo dolores et ea rebum.gubergren no sea takimata
-                                            magna aliquyam eratma</p>
-                                    </div>
-                                    <div class="author-id">
-                                        <img src="/public/images/author.png" alt="">
-
-                                        <div class="author-text">
-                                            <h4>Sophia</h4>
-
-                                            <h4>CEO, ReadyTheme</h4>
-                                        </div>
-                                    </div>
-                                </div>
+                                <?php endfor; ?>
                             </div>
                         </div>
-                    </div>
+                    </aside>
+                </div>
+            <?php endif; ?>
 
-                </aside>
-            </div>
             <div class="col-md-4">
                 <aside class="footer-widget">
-                    <h3 class="widget-title text-uppercase">Custom Category Post</h3>
+                    <h3 class="widget-title text-uppercase">Custom Post</h3>
 
 
                     <div class="custom-post">
                         <div>
-                            <a href="#"><img src="/public/images/footer-img.png" alt=""></a>
+                            <?php $article = Article::getRandomPost(); ?>
+
+                            <a href="<?= Url::toRoute(['site/view', 'id' => $article->id]) ?>">
+                                <img src="<?= $article->getimage(); ?>" alt="post">
+                            </a>
                         </div>
+
                         <div>
-                            <a href="#" class="text-uppercase">Home is peaceful Place</a>
-                            <span class="p-date">February 15, 2016</span>
+                            <a href="<?= Url::toRoute(['site/view', 'id' => $article->id]) ?>" class="text-uppercase">
+                                <?= $article->title; ?>
+                            </a>
+
+                            <span class="p-date">
+                                <?= $article->getDate(); ?>
+                            </span>
                         </div>
                     </div>
                 </aside>

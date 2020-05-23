@@ -31,9 +31,12 @@
                             <?= $article->content ?>
                         </div>
 
-                        <div class="decoration">
-                            <a href="#" class="btn btn-default">Decoration</a>
-                            <a href="#" class="btn btn-default">Decoration</a>
+                        <div>
+                            <?php foreach ($tags as $tag): ?>
+                                <a href="<?= Url::toRoute(['site/tag', 'id' => $tag->id]) ?>" class="btn btn-default">
+                                    <?= $tag->title; ?>
+                                </a>
+                            <?php endforeach; ?>
                         </div>
 
                         <div class="social-share">

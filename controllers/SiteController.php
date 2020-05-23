@@ -13,6 +13,7 @@ use app\models\ContactForm;
 use app\models\Article;
 use app\models\Category;
 use app\models\CommentForm;
+use app\models\Tag;
 
 class SiteController extends Controller
 {
@@ -74,13 +75,16 @@ class SiteController extends Controller
 
         $article->viewedCounter();
 
+        $tags = $article->getArticleTags();
+
         return $this->render('single', [
             'article' => $article,
             'popular' => $popular,
             'recent' => $recent,
             'categories' => $categories,
             'comments' => $comments,
-            'commentForm' => $commentForm
+            'commentForm' => $commentForm,
+            'tags' => $tags
         ]);
     }
 
@@ -97,6 +101,43 @@ class SiteController extends Controller
                 return $this->redirect(['site/view', 'id' => $id]);
             }
         }
+    }
+
+    public function actionSearch()
+    {
+        if(!Yii::$app->request->isPost){
+            return $this->actionIndex();
+        }
+
+        $arr = Yii::$app->request->post();
+        $data = Article::findAll($arr["search_value"]);
+        $popular = Article::getPopular();
+        $recent = Article::getRecent();
+        $categories = Category::getAll();
+
+        return $this->render('search', [
+            'articles' => $data['articles'],
+            'pagination' => $data['pagination'],
+            'popular' => $popular,
+            'recent' => $recent,
+            'categories' => $categories
+        ]);
+    }
+
+    public function actionTag($id)
+    {
+        $data = Tag::getArticlesByTag($id, $this);
+        $popular = Article::getPopular();
+        $recent = Article::getRecent();
+        $categories = Category::getAll();
+
+        return $this->render('tag', [
+            'articles' => $data['articles'],
+            'pagination' => $data['pagination'],
+            'recent' => $recent,
+            'popular' => $popular,
+            'categories' => $categories
+        ]);
     }
 
     public function actionCategory($id)

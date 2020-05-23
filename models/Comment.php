@@ -56,6 +56,11 @@ class Comment extends \yii\db\ActiveRecord
         ];
     }
 
+    public function getRecentComment($countComment)
+    {
+        return Comment::find()->where(['status' => 1])->orderBy('date desc')->limit($countComment)->all();
+    }
+
     /**
      * Gets query for [[Article]].
      *

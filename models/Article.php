@@ -69,6 +69,25 @@ class Article extends \yii\db\ActiveRecord
         return $data;
     }
 
+    public static function findAll($search, $pageSize = 5)
+    {
+        $query = Article::find()
+            ->orWhere(['like', 'title', $search])
+            ->orWhere(['like', 'description', $search])
+            ->orWhere(['like', 'content', $search]);
+
+        $count = $query->count();
+
+        $pagination = new Pagination(['totalCount' => $count, 'pageSize' => $pageSize]);
+
+        $articles = $query->offset($pagination->offset)->limit($pagination->limit)->all();
+
+        $data['articles'] = $articles;
+        $data['pagination'] = $pagination;
+
+        return $data;
+    }
+
     public static function getPopular()
     {
         return Article::find()->orderBy('viewed desc')->limit(3)->all();
@@ -187,6 +206,13 @@ class Article extends \yii\db\ActiveRecord
         ];
     }
 
+    public function getRandomPost()
+    {
+        $query = Article::find()->all();
+
+        return $query[array_rand($query, 1)];
+    }
+
     /**
      * Gets query for [[ArticleTags]].
      *
@@ -194,7 +220,7 @@ class Article extends \yii\db\ActiveRecord
      */
     public function getArticleTags()
     {
-        return $this->hasMany(ArticleTag::className(), ['article_id' => 'id']);
+        return $this->getTags()->all();
     }
 
     /**
